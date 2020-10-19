@@ -1,30 +1,26 @@
 ; Contants for Multiboot2 header
+MULTIBOOT2_MAGIC 	equ 0xe85250d6
+MULTIBOOT2_ARCH		equ 0x0
 MULTIBOOT2_LENGTH 	equ multiboot_header_end - multiboot_header
-MULTIBOOT2_CHECKSUM	equ	-(MULTIBOOT2_HEADER_MAGIC + MULTIBOOT2_ARCH + (MULTIBOOT2_LENGTH))
+MULTIBOOT2_CHECKSUM	equ	-(MULTIBOOT2_MAGIC + MULTIBOOT2_ARCH + (MULTIBOOT2_LENGTH))
 
 ; Declare a multiboot header that marks the program as a kernel. These are magic
 ; values that are documented in the multiboot standard. The bootloader will
 ; search for this signature in the first 8 KiB of the kernel file, aligned at a
-; 32-bit boundary. The signature is in its own section so the header can be
+; 64-bit boundary. The signature is in its own section so the header can be
 ; forced to be within the first 8 KiB of the kernel file.
 section .multiboot
 multiboot_header:
 	align 8
-	dd 0xe85250d6	; Multiboot2 magic number
-	dd 0x0			; Multiboot2 target architecture (i386)
-	dd MULTIBOOT2_LENGTH
-	dd MULTIBOOT2_CHECKSUM
-framebuffer_tag_start:
-	dw 5			; Framebuffer tag
-	dw 1			; Optional field
-	dd framebuffer_tag_end - framebuffer_tag_start ; Tag length
-	dd 800			; Framebuffer width
-	dd 600			; Framebuffer height
-	dd 32			; Framebuffer bits per pixel
-framebuffer_tag_end:
-	dw 0
-	dw 0
-	dd 8
+	dd MULTIBOOT2_MAGIC			; Multiboot2 magic number
+	dd MULTIBOOT2_ARCH			; Multiboot2 target architecture (i386)
+	dd MULTIBOOT2_LENGTH		; Multiboot2 section length
+	dd MULTIBOOT2_CHECKSUM		; Multiboot2 checksum
+terminate_tag:
+	align 8
+	dw 0x0
+	dw 0x0
+	dd 0x8
 multiboot_header_end:
 
 ; The multiboot standard does not define the value of the stack pointer register
