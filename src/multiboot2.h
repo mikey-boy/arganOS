@@ -27,10 +27,10 @@
 #define MULTIBOOT_HEADER_ALIGN			8
 
 /* The magic field should contain this.  */
-#define MULTIBOOT2_HEADER_MAGIC			0xe85250d6
+#define MULTIBOOTS_HEADER_MAGIC			0xe85250d6
 
 /* This should be in %eax.  */
-#define MULTIBOOT2_BOOTLOADER_MAGIC		0x36d76289
+#define MULTIBOOT_BOOTLOADER_MAGIC		0x36d76289
 
 /* Alignment of multiboot modules.  */
 #define MULTIBOOT_MOD_ALIGN			0x00001000
