@@ -2,26 +2,20 @@ CFLAGS = -std=gnu99 -ffreestanding -O2 -Wall -Wextra
 ASMFLAGS = -f elf32
 LINKFLAGS = -ffreestanding -O2 -nostdlib -lgcc
 
-ARCHDIR := kernel/arch/i386
+.PHONY: configure headers install clean
 
-asmobjects = $(patsubst $(ARCHDIR)/%.asm,$(ARCHDIR)/%.o,$(wildcard $(ARCHDIR)/*.asm))
-cobjects = $(patsubst kernel/%.c,kernel/%.o,$(wildcard kernel/*.c))
-objects = $(cobjects) $(asmobjects)
+headers:
+	$(MAKE) -C libc install-headers DESTDIR=$(SYSROOT) || exit $$?
+	$(MAKE) -C kernel install-headers DESTDIR=$(SYSROOT) || exit $$?
 
-.PHONY: all 
-
-all: kernel.bin
-
-kernel.bin: $(ARCHDIR)/linker.ld $(objects)
-	i686-elf-gcc -T $< -o $@ $(objects) $(LINKFLAGS)
-	grub-file --is-x86-multiboot2 $@
-	
-$(ARCHDIR)/%.o: $(ARCHDIR)/%.asm
-	nasm $(ASMFLAGS) $< -o $@
-
-kernel/%.o: kernel/%.c
-	i686-elf-gcc $(CFLAGS) -o $@ -c $<
+install: headers
+	$(MAKE) -C libc install DESTDIR=$(SYSROOT) || exit $$?
+	$(MAKE) -C kernel install DESTDIR=$(SYSROOT) || exit $$?
 
 clean:
-	rm kernel.bin
-	rm $(objects)
+	$(MAKE) -C kernel clean
+	$(MAKE) -C libc clean
+
+	rm -rf sysroot
+	rm -rf isodir
+	rm -rf arganOS.iso
